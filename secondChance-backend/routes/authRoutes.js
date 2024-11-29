@@ -6,8 +6,7 @@ require("dotenv").config();
 const jwt = require("jsonwebtoken");
 const JWT_SECRET = process.env.JWT_SECRET;
 const { body, validationResult } = require("express-validator");
-const pino = require("pino");
-const logger = pino();
+const logger = require("../logger");
 
 router.post("/register", async (req, res, next) => {
   try {

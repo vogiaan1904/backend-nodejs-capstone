@@ -1,4 +1,4 @@
-name: 'CI/CD'
+name: "CI/CD"
 
 on:
   push:
@@ -8,25 +8,24 @@ on:
 
 jobs:
   lint_js:
-      name: Lint JavaScript Files
-      runs-on: ubuntu-latest
+    name: Lint JavaScript Files
+    runs-on: ubuntu-latest
 
-      steps:
+    steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Install Node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v4
+        with:
+          node-version: "16" # Specify the Node.js version you are using
 
-      - name: Install and Run Linter
+      - name: Install Dependencies
         run: |
-          # This command finds all JavaScript files recursively and runs JSHint on them
-          npm init -y
-          npm install eslint eslint-config-standard eslint@^8.0.1 eslint-plugin-import@^2.25.2 eslint-plugin-n@^16.0.0  eslint-plugin-promise@^6.0.0
-          find ./secondChance-backend -name app.js -exec ./node_modules/.bin/eslint -c .eslintrc.js {} +
-          # find ./secondChance-backend -name auth.js -exec ./node_modules/.bin/eslint -c .eslintrc.js {} +
-          # find ./secondChance-backend -name secondChanceItemsRoutes.js -exec ./node_modules/.bin/eslint -c .eslintrc.js {} +
-          # find ./secondChance-backend -name searchRoutes.js -exec ./node_modules/.bin/eslint -c .eslintrc.js {} +
-          # find ./secondChance-backend -name index.js -exec ./node_modules/.bin/eslint -c .eslintrc.js {} +
-          # find ./sentiment -name index.js -exec ./node_modules/.bin/eslint -c .eslintrc.js {} +
-          echo "Linted all the js files successfully"
+          cd secondChance-backend
+          npm install
+
+      - name: Run ESLint
+        run: |
+          cd secondChance-backend
+          npx eslint . --fix --config ./eslint.config.js

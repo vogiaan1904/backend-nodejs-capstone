@@ -40,6 +40,43 @@ router.post("/register", async (req, res, next) => {
     res.json({ authtoken, email });
   } catch (e) {
     next(e);
+    return res.status(500).send("Internal server error");
+  }
+});
+
+router.post("/login", async (req, res, next) => {
+  try {
+    const db = await connectToDatabase();
+    const collection = db.collection("users");
+    const { email, password } = req.body;
+    const user = await collection.findOne({
+      email: email,
+    });
+
+    if (!user) {
+      logger.error("User not found");
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    const isMatch = await bcryptjs.compare(password, user.password);
+    if (!isMatch) {
+      logger.error("Passwords do not match");
+      return res.status(400).json({ error: "Wrong pasword" });
+    }
+
+    const payload = {
+      user: {
+        id: user._id.toString(),
+      },
+    };
+    const userName = user.firstName;
+    const userEmail = user.email;
+    const authtoken = jwt.sign(payload, JWT_SECRET);
+    logger.info("User logged in successfully");
+    return res.status(200).json({ authtoken, userName, userEmail });
+  } catch (e) {
+    next(e);
+    return res.status(500).send("Internal server error");
   }
 });
 
